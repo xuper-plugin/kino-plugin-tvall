@@ -7,15 +7,33 @@
   "icon": "icon.png",
   "description": "TV en vivo de múltiples fuentes dinámicas: canales 24/7 y eventos de hoy (deportes y más). Las fuentes se leen de una lista que se actualiza sola.",
   "descriptionEn": "Live TV from many dynamic sources: 24/7 channels and today's events (sports and more). Sources are read from a list that updates itself.",
-  "categories": ["live"],
-  "capabilities": ["channels", "home", "browse", "search", "scopedSearch", "resolve"],
+  "categories": [
+    "live"
+  ],
+  "capabilities": [
+    "channels",
+    "home",
+    "browse",
+    "search",
+    "resolve"
+  ],
   "liveStreamHosts": "any",
   "fetchHosts": "any",
   "hosts": [
-    { "host": "raw.githubusercontent.com" },
-    { "host": "cdn.jsdelivr.net" }
+    {
+      "host": "raw.githubusercontent.com"
+    },
+    {
+      "host": "cdn.jsdelivr.net"
+    }
   ],
   "settings": [
-    { "key": "status", "label": "Estado de las fuentes", "labelEn": "Sources status", "type": "status" }
-  ]
+    {
+      "key": "status",
+      "label": "Estado de las fuentes",
+      "labelEn": "Sources status",
+      "type": "status"
+    }
+  ],
+  "browser": true
 }

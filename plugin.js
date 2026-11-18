@@ -364,8 +364,20 @@ var generic_default = {
   },
   async resolve(host, id, ctx2) {
     const r = host.recipe || {};
-    if (!r.playerURL || !r.streamRegex) return null;
+    if (!r.playerURL) return null;
     const playerUrl = abs(host.base, fill(r.playerURL, { id, base: host.base }));
+    if (r.capture) {
+      try {
+        const left = Math.max(1e3, (ctx2.deadline || Date.now() + 18e3) - Date.now());
+        const cap = await kino.browser.capture(playerUrl, { match: r.match || void 0, headers: { Referer: host.base + "/" }, timeoutMs: left });
+        const m = cap && cap.media && cap.media[0];
+        if (!m || !m.url) return null;
+        return { url: m.url, mime: m.mime || HLS_MIME, headers: m.headers || { "User-Agent": UA, Referer: host.base + "/" } };
+      } catch (_) {
+        return null;
+      }
+    }
+    if (!r.streamRegex) return null;
     let html;
     try {
       html = await ctx2.fetchText(playerUrl, { Referer: host.base + "/" }, { deadline: ctx2.deadline });

@@ -58,8 +58,22 @@ export default {
 
   async resolve(host, id, ctx) {
     const r = host.recipe || {};
-    if (!r.playerURL || !r.streamRegex) return null;
+    if (!r.playerURL) return null;
     const playerUrl = abs(host.base, fill(r.playerURL, { id, base: host.base }));
+
+    // capture mode: let the hidden WebView run the player's JS and hand back the .m3u8 it requested,
+    // with the Referer/UA/Cookie it used. This resolves token/anti-bot sites a flat scrape cannot.
+    if (r.capture) {
+      try {
+        const left = Math.max(1000, (ctx.deadline || Date.now() + 18000) - Date.now());
+        const cap = await kino.browser.capture(playerUrl, { match: r.match || undefined, headers: { Referer: host.base + "/" }, timeoutMs: left });
+        const m = cap && cap.media && cap.media[0];
+        if (!m || !m.url) return null;
+        return { url: m.url, mime: m.mime || HLS_MIME, headers: m.headers || { "User-Agent": UA, Referer: host.base + "/" } };
+      } catch (_) { return null; }
+    }
+
+    if (!r.streamRegex) return null;
     let html;
     try { html = await ctx.fetchText(playerUrl, { Referer: host.base + "/" }, { deadline: ctx.deadline }); }
     catch (_) { return null; }
