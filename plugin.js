@@ -40,17 +40,22 @@ var SEED = {
     {
       "id": "thedaddy",
       "name": "TheDaddy",
-      "type": "daddylive",
-      "base": "https://thedaddy.pk",
-      "enabled": false,
+      "type": "generic",
+      "base": "https://thedaddy.li",
+      "enabled": true,
       "status": "unknown",
       "lastCheck": 0,
       "weight": 10,
       "provides": [
-        "channels",
-        "events"
+        "channels"
       ],
-      "recipe": {}
+      "recipe": {
+        "listURL": "/24-7-channels.php",
+        "channelItemRegex": 'href="/watch\\.php\\?id=(?<id>\\d+)"[\\s\\S]*?class="card__title">(?<name>[^<]+)<',
+        "playerURL": "/watch.php?id={id}",
+        "capture": true,
+        "match": "m3u8"
+      }
     },
     {
       "id": "daddylive",
