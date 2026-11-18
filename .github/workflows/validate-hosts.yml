@@ -1,0 +1,26 @@
+name: Validate hosts
+on:
+  schedule:
+    - cron: "17 6 * * *"   # daily ~06:17 UTC
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: node tools/validate-hosts.mjs
+      - name: Commit updated statuses
+        run: |
+          git config user.name "xuper-plugin"
+          git config user.email "335105665+xuper-plugin@users.noreply.github.com"
+          if ! git diff --quiet -- tvall.json src/catalog-seed.js; then
+            git add tvall.json src/catalog-seed.js
+            git commit -m "chore: daily host status refresh"
+            git push
+          else
+            echo "no status change"
+          fi
