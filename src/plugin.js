@@ -5,6 +5,7 @@ import { allChannels, resolveRef, liveNow, catalogHasEvents } from "./aggregate.
 
 const CALL_MS = 18000;
 const HOME_ROW_MAX = 40;
+const CHANNELS_MAX = 500; // Kino caps a live category at 500; trim here so nothing is dropped with noise
 const EVENTS_TTL_MS = 8 * 60 * 1000; // events are time-bound: refetch often
 const EVENTS_KEY = "events.v1";
 
@@ -35,7 +36,7 @@ export async function liveChannels(arg) {
   if (categoryId === "live-now") return { items: await liveNowCached(cat) };
   const chans = await allChannels(cat, ctx());
   const items = categoryId === "all" ? chans : chans.filter((c) => c.categoryId === categoryId);
-  return { items };
+  return { items: items.slice(0, CHANNELS_MAX) };
 }
 
 export async function liveSearch(arg) {

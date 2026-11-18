@@ -40,7 +40,9 @@ async function listFrom(kind, cat, ctx, hf) {
   }
   return [...byKey.values()].map((e) => {
     e.cands.sort((a, b) => b.weight - a.weight);
-    const out = { id: encodeRef(e.cands), title: e.title, logo: e.logo, categoryId: e.categoryId || "all" };
+    const ref = encodeRef(e.cands);
+    // Kino resolves a live channel by its `ref`; `id` is just the row identity. Both are the encoded candidates.
+    const out = { id: ref, ref, title: e.title, logo: e.logo, categoryId: e.categoryId || "all" };
     if (e.start) out.start = e.start;
     return out;
   });

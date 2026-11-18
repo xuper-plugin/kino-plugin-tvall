@@ -24,6 +24,14 @@ test("allChannels merges up hosts, de-dupes by title, and isolates a throwing ho
   assert.equal(chans.filter((c) => c.title === "ESPN").length, 1, "ESPN de-duped to one");
 });
 
+test("every channel carries a ref Kino can resolve (not just an id)", async () => {
+  const chans = await allChannels(cat, ctx, hf);
+  for (const c of chans) assert.ok(c.ref, `channel ${c.title} has a ref`);
+  const espn = chans.find((c) => c.title === "ESPN");
+  const stream = await resolveRef(cat, espn.ref, ctx, hf);
+  assert.equal(stream.url, "https://s/b.m3u8");
+});
+
 test("a status:down host contributes nothing", async () => {
   const chans = await allChannels(cat, ctx, hf);
   // host d (down) would add ESPN/TNT again; de-dupe + the down filter keep exactly 2 titles.

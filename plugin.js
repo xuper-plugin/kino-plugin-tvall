@@ -478,7 +478,8 @@ async function listFrom(kind, cat, ctx2, hf) {
   }
   return [...byKey.values()].map((e) => {
     e.cands.sort((a, b) => b.weight - a.weight);
-    const out = { id: encodeRef(e.cands), title: e.title, logo: e.logo, categoryId: e.categoryId || "all" };
+    const ref = encodeRef(e.cands);
+    const out = { id: ref, ref, title: e.title, logo: e.logo, categoryId: e.categoryId || "all" };
     if (e.start) out.start = e.start;
     return out;
   });
@@ -516,6 +517,7 @@ async function resolveRef(cat, ref, ctx2, hf = handlerFor) {
 // src/plugin.js
 var CALL_MS = 18e3;
 var HOME_ROW_MAX = 40;
+var CHANNELS_MAX = 500;
 var EVENTS_TTL_MS = 8 * 60 * 1e3;
 var EVENTS_KEY = "events.v1";
 async function liveNowCached(cat) {
@@ -548,7 +550,7 @@ async function liveChannels(arg) {
   if (categoryId === "live-now") return { items: await liveNowCached(cat) };
   const chans = await allChannels(cat, ctx());
   const items = categoryId === "all" ? chans : chans.filter((c) => c.categoryId === categoryId);
-  return { items };
+  return { items: items.slice(0, CHANNELS_MAX) };
 }
 async function liveSearch(arg) {
   const q = norm2(arg && arg.query);
