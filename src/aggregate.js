@@ -56,6 +56,22 @@ export function allEvents(cat, ctx, hf = handlerFor) {
   return listFrom("events", cat, ctx, hf);
 }
 
+// "Live now" window: an event counts as live from 15 min before kickoff until 3 h after. An event with
+// no known start (a 24/7-style entry) always counts.
+const LIVE_AHEAD_MS = 15 * 60 * 1000;
+const LIVE_BEHIND_MS = 3 * 60 * 60 * 1000;
+const isLiveNow = (ev, now) => !ev.start || (ev.start <= now + LIVE_AHEAD_MS && ev.start >= now - LIVE_BEHIND_MS);
+
+/** Today's events across active hosts, keeping only those live now (past events dropped). */
+export async function liveNow(cat, ctx, hf = handlerFor, now = Date.now()) {
+  return (await allEvents(cat, ctx, hf)).filter((e) => isLiveNow(e, now));
+}
+
+/** Whether any active host offers events (so the "En vivo ahora" category is worth showing). */
+export function catalogHasEvents(cat) {
+  return activeHosts(cat).some((h) => (h.provides || []).includes("events"));
+}
+
 /** Resolve a channel/event ref: try each candidate host in weight order, first playable stream wins, else null. */
 export async function resolveRef(cat, ref, ctx, hf = handlerFor) {
   for (const { hostId, id } of decodeRef(ref)) {

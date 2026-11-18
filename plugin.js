@@ -469,6 +469,18 @@ async function listFrom(kind, cat, ctx2, hf) {
 function allChannels(cat, ctx2, hf = handlerFor) {
   return listFrom("channels", cat, ctx2, hf);
 }
+function allEvents(cat, ctx2, hf = handlerFor) {
+  return listFrom("events", cat, ctx2, hf);
+}
+var LIVE_AHEAD_MS = 15 * 60 * 1e3;
+var LIVE_BEHIND_MS = 3 * 60 * 60 * 1e3;
+var isLiveNow = (ev, now) => !ev.start || ev.start <= now + LIVE_AHEAD_MS && ev.start >= now - LIVE_BEHIND_MS;
+async function liveNow(cat, ctx2, hf = handlerFor, now = Date.now()) {
+  return (await allEvents(cat, ctx2, hf)).filter((e) => isLiveNow(e, now));
+}
+function catalogHasEvents(cat) {
+  return activeHosts(cat).some((h) => (h.provides || []).includes("events"));
+}
 async function resolveRef(cat, ref, ctx2, hf = handlerFor) {
   for (const { hostId, id } of decodeRef(ref)) {
     const host = (cat.hosts || []).find((h) => h.id === hostId);
@@ -487,15 +499,36 @@ async function resolveRef(cat, ref, ctx2, hf = handlerFor) {
 // src/plugin.js
 var CALL_MS = 18e3;
 var HOME_ROW_MAX = 40;
+var EVENTS_TTL_MS = 8 * 60 * 1e3;
+var EVENTS_KEY = "events.v1";
+async function liveNowCached(cat) {
+  try {
+    const c = kino.storage.get(EVENTS_KEY);
+    if (c) {
+      const { at, v } = JSON.parse(c);
+      if (Date.now() - at < EVENTS_TTL_MS) return v.filter((e) => !e.start || e.start >= Date.now() - 3 * 60 * 60 * 1e3);
+    }
+  } catch (_) {
+  }
+  const evs = await liveNow(cat, ctx());
+  try {
+    kino.storage.set(EVENTS_KEY, JSON.stringify({ at: Date.now(), v: evs }), { ttlMs: EVENTS_TTL_MS });
+  } catch (_) {
+  }
+  return evs;
+}
 var ctx = () => makeCtx({ deadline: Date.now() + CALL_MS, settings: {} });
 var norm2 = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 async function liveCategories() {
-  await null;
-  return [{ id: "all", title: t("catAll") }];
+  const cat = await loadCatalog().catch(() => ({ hosts: [] }));
+  const cats = [{ id: "all", title: t("catAll") }];
+  if (catalogHasEvents(cat)) cats.unshift({ id: "live-now", title: t("liveNow") });
+  return cats;
 }
 async function liveChannels(arg) {
   const categoryId = arg && arg.categoryId || "all";
   const cat = await loadCatalog();
+  if (categoryId === "live-now") return { items: await liveNowCached(cat) };
   const chans = await allChannels(cat, ctx());
   const items = categoryId === "all" ? chans : chans.filter((c) => c.categoryId === categoryId);
   return { items };
