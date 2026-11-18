@@ -5,12 +5,16 @@ const CATALOG = {
     statusOk: "{n} fuentes activas.",
     statusNone: "Sin fuentes activas por ahora.",
     liveNow: "En vivo ahora",
+    catAll: "Todos",
+    channelsRow: "Canales en vivo",
   },
   en: {
     noStream: "This channel isn't available right now. Try another one.",
     statusOk: "{n} active sources.",
     statusNone: "No active sources right now.",
     liveNow: "Live now",
+    catAll: "All",
+    channelsRow: "Live channels",
   },
 };
 

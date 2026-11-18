@@ -1,44 +1,62 @@
 import { t } from "./i18n.js";
+import { loadCatalog, activeHosts } from "./catalog.js";
+import { makeCtx } from "./net.js";
+import { allChannels, resolveRef } from "./aggregate.js";
 
-// Kino live-TV surface. The real listing/resolve logic arrives in later tasks; these are the exports
-// Kino calls, kept as safe no-ops so the manifest's capabilities are all backed by an export.
+const CALL_MS = 18000;
+const HOME_ROW_MAX = 40;
+
+const ctx = () => makeCtx({ deadline: Date.now() + CALL_MS, settings: {} });
+const norm = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
 export async function liveCategories() {
   await null;
-  return [];
+  return [{ id: "all", title: t("catAll") }];
 }
 
-export async function liveChannels(_arg) {
-  await null;
-  return { items: [] };
+export async function liveChannels(arg) {
+  const categoryId = (arg && arg.categoryId) || "all";
+  const cat = await loadCatalog();
+  const chans = await allChannels(cat, ctx());
+  const items = categoryId === "all" ? chans : chans.filter((c) => c.categoryId === categoryId);
+  return { items };
 }
 
-export async function liveSearch(_arg) {
-  await null;
-  return [];
+export async function liveSearch(arg) {
+  const q = norm(arg && arg.query);
+  if (!q) return [];
+  const cat = await loadCatalog();
+  return (await allChannels(cat, ctx())).filter((c) => norm(c.title).includes(q));
 }
 
 export async function home() {
-  await null;
-  return [];
+  const cat = await loadCatalog();
+  const chans = await allChannels(cat, ctx());
+  if (!chans.length) return [];
+  return [{ id: "live-channels", title: t("channelsRow"), items: chans.slice(0, HOME_ROW_MAX), ref: "all" }];
 }
 
-export async function browse(_ref) {
-  await null;
-  return { items: [] };
+export async function browse(ref) {
+  const cat = await loadCatalog();
+  const chans = await allChannels(cat, ctx());
+  const items = !ref || ref === "all" ? chans : chans.filter((c) => c.categoryId === ref);
+  return { items };
 }
 
-export async function search(_arg) {
-  await null;
-  return { items: [] };
+export async function search(arg) {
+  const query = typeof arg === "string" ? arg : (arg && (arg.q || arg.query)) || "";
+  return { items: await liveSearch({ query }) };
 }
 
 export async function resolve(ref) {
-  await null;
-  throw kino.error("not_found", "unknown ref: " + ref, { userMessage: t("noStream") });
+  const cat = await loadCatalog();
+  const stream = await resolveRef(cat, ref, ctx());
+  if (!stream) throw kino.error("not_found", "no playable source for " + ref, { userMessage: t("noStream") });
+  return stream;
 }
 
 export async function settingsStatus() {
-  await null;
-  return { status: t("statusNone") };
+  const cat = await loadCatalog().catch(() => ({ hosts: [] }));
+  const n = activeHosts(cat).length;
+  return { status: n ? t("statusOk", { n }) : t("statusNone") };
 }
