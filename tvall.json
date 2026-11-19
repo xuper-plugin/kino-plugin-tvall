@@ -88,17 +88,12 @@
         "listJSON": true,
         "playerURL": "/total/stream-{id}.php",
         "capture": true,
-        "diag": true,
-        "returnCookiesOnTimeout": true,
-        "match": "\\.(m3u8|ts|mpd|mp4|fmp4|key)",
+        "match": "\\.m3u8",
         "captureAll": true,
         "alsoMatch": [
+          "index\\.m3u8",
           "/live/",
-          "/hls/",
-          "/stream",
-          "token",
-          "\\.php",
-          "\\.js"
+          "/hls/"
         ]
       }
     },
