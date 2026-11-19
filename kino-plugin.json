@@ -1,7 +1,7 @@
 {
   "id": "tvall",
   "name": "TVall",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "apiVersion": 9,
   "entry": "plugin.js",
   "icon": "icon.png",
@@ -38,6 +38,6 @@
   "browser": "pages",
   "signature": {
     "authorKey": "6693946bd5c56196960959c4b9665fad5094374bcb85ddb282f8bf762c835263",
-    "value": "ad6ea264bc093b53f722bcaaece6386df1761bf55c8d2b786899f63b8cf4d37638c58971c782bff67c050f4d2ea151de836c9188a4ce6a918edebb02186bcc0d"
+    "value": "57010c5e4dfcef335b09fc15b9c4eb8b6e12db93bb6a493b5b984a8f7d83044ef0179ffae1f12524aac74eff092cb5856c44919d041c2f8a494fb9f8a71a9e0e"
   }
 }

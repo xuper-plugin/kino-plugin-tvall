@@ -352,7 +352,8 @@ export const SEED = {
         "channelItemRegex": "data-ch=\"(?<id>[a-z0-9-]+)\"[^>]*href=\"/canal/[^\"]*\">(?<name>[^<]+)</a>",
         "playerURL": "/canal/{id}/",
         "resolvePage": true,
-        "diag": true
+        "diag": true,
+        "pageWaitFor": "data-url=|\\.m3u8|<iframe"
       }
     },
     {

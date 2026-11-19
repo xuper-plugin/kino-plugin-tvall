@@ -119,8 +119,9 @@ export default {
         if (r.diag && typeof kino.log === "function") {
           try {
             kino.log("[diag] page finalUrl=" + (page && page.finalUrl) + " status=" + (page && page.status) + " topLen=" + html.length + " docLen=" + doc.length);
+            (doc.match(/data-url=["'][^"']+["']/gi) || []).slice(0, 8).forEach((x, i) => kino.log("[diag] dataurl#" + i + " " + x.slice(0, 160)));
             (doc.match(/<iframe[^>]*src=["'][^"']+["']/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] iframe#" + i + " " + x.slice(0, 160)));
-            (doc.match(/https?:\/\/[^"'\s<>]+\.(m3u8|mpd|ts)[^"'\s<>]*/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] media#" + i + " " + x));
+            (doc.match(/https?:\/\/[^"'\s<>]+(\.m3u8|\.mpd|embed|youtube|\/player|stream|\.php)[^"'\s<>]*/gi) || []).slice(0, 8).forEach((x, i) => kino.log("[diag] url#" + i + " " + x.slice(0, 160)));
           } catch (_) { /* diag only */ }
         }
         const mm = doc.match(/https?:\/\/[^"'\s<>]+\.m3u8[^"'\s<>]*/i);

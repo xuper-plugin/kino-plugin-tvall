@@ -386,7 +386,8 @@ var SEED = {
         "channelItemRegex": 'data-ch="(?<id>[a-z0-9-]+)"[^>]*href="/canal/[^"]*">(?<name>[^<]+)</a>',
         "playerURL": "/canal/{id}/",
         "resolvePage": true,
-        "diag": true
+        "diag": true,
+        "pageWaitFor": "data-url=|\\.m3u8|<iframe"
       }
     },
     {
@@ -618,8 +619,9 @@ var generic_default = {
         if (r.diag && typeof kino.log === "function") {
           try {
             kino.log("[diag] page finalUrl=" + (page && page.finalUrl) + " status=" + (page && page.status) + " topLen=" + html2.length + " docLen=" + doc.length);
+            (doc.match(/data-url=["'][^"']+["']/gi) || []).slice(0, 8).forEach((x, i) => kino.log("[diag] dataurl#" + i + " " + x.slice(0, 160)));
             (doc.match(/<iframe[^>]*src=["'][^"']+["']/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] iframe#" + i + " " + x.slice(0, 160)));
-            (doc.match(/https?:\/\/[^"'\s<>]+\.(m3u8|mpd|ts)[^"'\s<>]*/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] media#" + i + " " + x));
+            (doc.match(/https?:\/\/[^"'\s<>]+(\.m3u8|\.mpd|embed|youtube|\/player|stream|\.php)[^"'\s<>]*/gi) || []).slice(0, 8).forEach((x, i) => kino.log("[diag] url#" + i + " " + x.slice(0, 160)));
           } catch (_) {
           }
         }
