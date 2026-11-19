@@ -298,7 +298,7 @@ export const SEED = {
       "name": "Matchora",
       "type": "generic",
       "base": "https://matchora.to",
-      "enabled": true,
+      "enabled": false,
       "status": "unknown",
       "lastCheck": 0,
       "weight": 7,
