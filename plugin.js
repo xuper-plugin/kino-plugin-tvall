@@ -567,7 +567,15 @@ var generic_default = {
       return items.filter((it) => it && it.id != null).map((it) => ({ id: String(it.id), title: String(it.name || it.n || it.title || it.id).trim(), categoryId: "all" }));
     }
     if (!r.channelItemRegex) return [];
-    return matchAllNamed(body, r.channelItemRegex).filter((g) => g.id).map((g) => ({ id: String(g.id), title: (g.name || g.title || g.id).trim(), logo: g.logo ? abs(host.base, g.logo) : void 0, categoryId: "all" }));
+    const rows = matchAllNamed(body, r.channelItemRegex);
+    if (r.diag && typeof kino.log === "function") {
+      try {
+        kino.log("[diag] list " + host.id + " bodyLen=" + body.length + " matches=" + rows.length + " first=" + (rows[0] ? rows[0].id + "|" + rows[0].name : "none"));
+        kino.log("[diag] list " + host.id + " head=" + body.slice(0, 180).replace(/\s+/g, " "));
+      } catch (_) {
+      }
+    }
+    return rows.filter((g) => g.id).map((g) => ({ id: String(g.id), title: (g.name || g.title || g.id).trim(), logo: g.logo ? abs(host.base, g.logo) : void 0, categoryId: "all" }));
   },
   async listEvents(host, ctx2) {
     const r = host.recipe || {};

@@ -68,7 +68,14 @@ export default {
     }
 
     if (!r.channelItemRegex) return [];
-    return matchAllNamed(body, r.channelItemRegex)
+    const rows = matchAllNamed(body, r.channelItemRegex);
+    if (r.diag && typeof kino.log === "function") {
+      try {
+        kino.log("[diag] list " + host.id + " bodyLen=" + body.length + " matches=" + rows.length + " first=" + (rows[0] ? (rows[0].id + "|" + rows[0].name) : "none"));
+        kino.log("[diag] list " + host.id + " head=" + body.slice(0, 180).replace(/\s+/g, " "));
+      } catch (_) { /* diag only */ }
+    }
+    return rows
       .filter((g) => g.id)
       .map((g) => ({ id: String(g.id), title: (g.name || g.title || g.id).trim(), logo: g.logo ? abs(host.base, g.logo) : undefined, categoryId: "all" }));
   },
