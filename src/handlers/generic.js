@@ -85,6 +85,17 @@ export default {
         // fires the .m3u8 among many requests, or behind a challenge, still gets caught. alsoMatch widens it.
         if (r.captureAll && kino.browser.captureAll) { opts.captureAll = true; if (r.alsoMatch) opts.alsoMatch = r.alsoMatch; }
         const cap = await kino.browser.capture(playerUrl, opts);
+        // diag: a throwaway probe. Dump everything the WebView handed back so a logcat read shows which
+        // URL the player actually requested (tokenised path, non-.m3u8 extension, or the challenged one).
+        if (r.diag && typeof kino.log === "function") {
+          try {
+            kino.log("[diag] player=" + playerUrl + " timedOut=" + (cap && cap.timedOut) + " finalUrl=" + (cap && cap.finalUrl));
+            kino.log("[diag] media=" + JSON.stringify((cap && cap.media || []).map((x) => ({ url: x.url, mime: x.mime }))));
+            const reqs = (cap && cap.requests) || [];
+            kino.log("[diag] requests=" + reqs.length);
+            reqs.slice(0, 20).forEach((x, i) => kino.log("[diag] req#" + i + " " + x.url));
+          } catch (_) { /* diag only */ }
+        }
         let m = cap && cap.media && cap.media[0];
         if (!m && cap && Array.isArray(cap.requests)) {
           const q = cap.requests.find((x) => /\.m3u8(\?|$)/i.test(x.url)) || cap.requests.find((x) => /\.m3u8/i.test(x.url));

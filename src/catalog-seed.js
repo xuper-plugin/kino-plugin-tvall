@@ -89,12 +89,16 @@ export const SEED = {
         "listJSON": true,
         "playerURL": "/total/stream-{id}.php",
         "capture": true,
-        "match": "\\.m3u8",
+        "diag": true,
+        "match": "\\.(m3u8|ts|mpd|mp4|fmp4|key)",
         "captureAll": true,
         "alsoMatch": [
-          "index\\.m3u8",
           "/live/",
-          "/hls/"
+          "/hls/",
+          "/stream",
+          "token",
+          "\\.php",
+          "\\.js"
         ]
       }
     },
