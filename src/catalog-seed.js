@@ -340,14 +340,20 @@ export const SEED = {
       "name": "DondeVerFutbolHoy",
       "type": "generic",
       "base": "https://dondeverfutbolhoy.com",
-      "enabled": false,
+      "enabled": true,
       "status": "unknown",
       "lastCheck": 0,
-      "weight": 4,
+      "weight": 6,
       "provides": [
-        "events"
+        "channels"
       ],
-      "recipe": {}
+      "recipe": {
+        "listURL": "/",
+        "channelItemRegex": "data-ch=\"(?<id>[a-z0-9-]+)\"[^>]*href=\"/canal/[^\"]*\">(?<name>[^<]+)</a>",
+        "playerURL": "/canal/{id}/",
+        "resolvePage": true,
+        "diag": true
+      }
     },
     {
       "id": "damitv",

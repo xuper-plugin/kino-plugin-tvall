@@ -374,14 +374,20 @@ var SEED = {
       "name": "DondeVerFutbolHoy",
       "type": "generic",
       "base": "https://dondeverfutbolhoy.com",
-      "enabled": false,
+      "enabled": true,
       "status": "unknown",
       "lastCheck": 0,
-      "weight": 4,
+      "weight": 6,
       "provides": [
-        "events"
+        "channels"
       ],
-      "recipe": {}
+      "recipe": {
+        "listURL": "/",
+        "channelItemRegex": 'data-ch="(?<id>[a-z0-9-]+)"[^>]*href="/canal/[^"]*">(?<name>[^<]+)</a>',
+        "playerURL": "/canal/{id}/",
+        "resolvePage": true,
+        "diag": true
+      }
     },
     {
       "id": "damitv",
@@ -578,6 +584,44 @@ var generic_default = {
     const r = host.recipe || {};
     if (!r.playerURL) return null;
     const playerUrl = abs(host.base, fill(r.playerURL, { id, base: host.base }));
+    if (r.resolvePage && kino.browser && kino.browser.page) {
+      try {
+        const budget = () => Math.max(1500, (ctx2.deadline || Date.now() + 18e3) - Date.now());
+        const page = await kino.browser.page(playerUrl, { waitFor: r.pageWaitFor || void 0, timeoutMs: budget() });
+        const html2 = page && page.html || "";
+        let doc = html2, hopOrigin = host.base;
+        if (r.pageIframeRegex) {
+          const g = matchNamed(html2, r.pageIframeRegex);
+          if (g && g.url) {
+            const hopUrl = abs(host.base, g.url.replace(/\\\//g, "/"));
+            try {
+              const p2 = await kino.browser.page(hopUrl, { waitFor: r.pageWaitFor || void 0, timeoutMs: budget() });
+              if (p2 && p2.html) {
+                doc = p2.html;
+                try {
+                  hopOrigin = new URL(hopUrl).origin;
+                } catch (_) {
+                }
+              }
+            } catch (_) {
+            }
+          }
+        }
+        if (r.diag && typeof kino.log === "function") {
+          try {
+            kino.log("[diag] page finalUrl=" + (page && page.finalUrl) + " status=" + (page && page.status) + " topLen=" + html2.length + " docLen=" + doc.length);
+            (doc.match(/<iframe[^>]*src=["'][^"']+["']/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] iframe#" + i + " " + x.slice(0, 160)));
+            (doc.match(/https?:\/\/[^"'\s<>]+\.(m3u8|mpd|ts)[^"'\s<>]*/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] media#" + i + " " + x));
+          } catch (_) {
+          }
+        }
+        const mm = doc.match(/https?:\/\/[^"'\s<>]+\.m3u8[^"'\s<>]*/i);
+        if (mm) return { url: mm[0].replace(/\\\//g, "/"), mime: HLS_MIME, headers: { "User-Agent": UA, Referer: hopOrigin + "/", Origin: host.base } };
+        return null;
+      } catch (_) {
+        return null;
+      }
+    }
     if (r.capture) {
       try {
         const left = Math.max(1e3, (ctx2.deadline || Date.now() + 18e3) - Date.now());

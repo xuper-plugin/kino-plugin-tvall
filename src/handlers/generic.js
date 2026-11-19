@@ -89,6 +89,39 @@ export default {
     if (!r.playerURL) return null;
     const playerUrl = abs(host.base, fill(r.playerURL, { id, base: host.base }));
 
+    // resolvePage mode ("browser": "pages"): render the player page so its scripts run, then read the
+    // .m3u8 straight out of the final DOM. For a site whose player is built by JS — no flat scrape, and
+    // whose segments a capture session can't carry — the rendered DOM often still holds a plain .m3u8 src.
+    if (r.resolvePage && kino.browser && kino.browser.page) {
+      try {
+        const budget = () => Math.max(1500, (ctx.deadline || Date.now() + 18000) - Date.now());
+        const page = await kino.browser.page(playerUrl, { waitFor: r.pageWaitFor || undefined, timeoutMs: budget() });
+        const html = (page && page.html) || "";
+        // one optional hop: the real player often lives in an iframe; render that too.
+        let doc = html, hopOrigin = host.base;
+        if (r.pageIframeRegex) {
+          const g = matchNamed(html, r.pageIframeRegex);
+          if (g && g.url) {
+            const hopUrl = abs(host.base, g.url.replace(/\\\//g, "/"));
+            try {
+              const p2 = await kino.browser.page(hopUrl, { waitFor: r.pageWaitFor || undefined, timeoutMs: budget() });
+              if (p2 && p2.html) { doc = p2.html; try { hopOrigin = new URL(hopUrl).origin; } catch (_) {} }
+            } catch (_) { /* keep top doc */ }
+          }
+        }
+        if (r.diag && typeof kino.log === "function") {
+          try {
+            kino.log("[diag] page finalUrl=" + (page && page.finalUrl) + " status=" + (page && page.status) + " topLen=" + html.length + " docLen=" + doc.length);
+            (doc.match(/<iframe[^>]*src=["'][^"']+["']/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] iframe#" + i + " " + x.slice(0, 160)));
+            (doc.match(/https?:\/\/[^"'\s<>]+\.(m3u8|mpd|ts)[^"'\s<>]*/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] media#" + i + " " + x));
+          } catch (_) { /* diag only */ }
+        }
+        const mm = doc.match(/https?:\/\/[^"'\s<>]+\.m3u8[^"'\s<>]*/i);
+        if (mm) return { url: mm[0].replace(/\\\//g, "/"), mime: HLS_MIME, headers: { "User-Agent": UA, Referer: hopOrigin + "/", Origin: host.base } };
+        return null;
+      } catch (_) { return null; }
+    }
+
     // capture mode: let the hidden WebView run the player's JS and hand back the .m3u8 it requested,
     // with the Referer/UA/Cookie it used. This resolves token/anti-bot sites a flat scrape cannot.
     if (r.capture) {
