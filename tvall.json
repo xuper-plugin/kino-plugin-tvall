@@ -297,15 +297,26 @@
       "name": "Matchora",
       "type": "generic",
       "base": "https://matchora.to",
-      "enabled": false,
+      "enabled": true,
       "status": "unknown",
       "lastCheck": 0,
-      "weight": 5,
+      "weight": 7,
       "provides": [
-        "channels",
         "events"
       ],
-      "recipe": {}
+      "recipe": {
+        "eventsURL": "/",
+        "eventItemRegex": "data-eid=\"(?<id>[a-z0-9]+)\"[^>]*href=\"/match/[^\"]*\">\\s*(?:<span[^>]*>[^<]*</span>)?\\s*<b>(?<name>[^<]+)</b>",
+        "playerURL": "/embed/match/{id}",
+        "capture": true,
+        "match": "\\.m3u8",
+        "captureAll": true,
+        "alsoMatch": [
+          "index\\.m3u8",
+          "/hls/",
+          "/live/"
+        ]
+      }
     },
     {
       "id": "teledeportes",
