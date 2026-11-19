@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": 1795103599001,
+  "updatedAt": 0,
   "hosts": [
     {
       "id": "thedaddy",
@@ -8,8 +8,8 @@
       "type": "generic",
       "base": "https://thedaddy.li",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 10,
       "provides": [
         "channels"
@@ -34,8 +34,8 @@
       "type": "daddylive",
       "base": "https://daddylive.app",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 10,
       "provides": [
         "channels",
@@ -49,8 +49,8 @@
       "type": "generic",
       "base": "https://verpartidos.cc",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 5,
       "provides": [
         "events"
@@ -63,8 +63,8 @@
       "type": "generic",
       "base": "https://tiroalpalooffi.com",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 5,
       "provides": [
         "events"
@@ -77,8 +77,8 @@
       "type": "generic",
       "base": "https://deportelibre.top",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 8,
       "provides": [
         "channels"
@@ -103,8 +103,8 @@
       "type": "generic",
       "base": "https://ntv.cx",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 5,
       "provides": [
         "channels"
@@ -117,8 +117,8 @@
       "type": "livetv",
       "base": "https://livetv.sx",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 6,
       "provides": [
         "events"
@@ -131,8 +131,8 @@
       "type": "zicotv",
       "base": "https://bp.zicotv.cc",
       "enabled": true,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 9,
       "provides": [
         "channels",
@@ -298,8 +298,8 @@
       "type": "generic",
       "base": "https://matchora.to",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 7,
       "provides": [
         "events"
@@ -326,8 +326,8 @@
       "type": "generic",
       "base": "https://teledeportes.st",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 5,
       "provides": [
         "events"
@@ -339,9 +339,9 @@
       "name": "DondeVerFutbolHoy",
       "type": "generic",
       "base": "https://dondeverfutbolhoy.com",
-      "enabled": true,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "enabled": false,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 6,
       "provides": [
         "channels"
@@ -351,7 +351,6 @@
         "channelItemRegex": "data-ch=\"(?<id>[a-z0-9-]+)\"[^>]*href=\"/canal/[^\"]*\">(?<name>[^<]+)</a>",
         "playerURL": "/canal/{id}/",
         "resolvePage": true,
-        "diag": true,
         "pageWaitFor": "data-url=|\\.m3u8|<iframe"
       }
     },
@@ -361,8 +360,8 @@
       "type": "generic",
       "base": "https://damitv.st",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 5,
       "provides": [
         "channels",
@@ -376,8 +375,8 @@
       "type": "generic",
       "base": "https://tvnow247.top",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 5,
       "provides": [
         "channels"
@@ -390,8 +389,8 @@
       "type": "generic",
       "base": "https://tarjetarojatvdirecta.online",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 4,
       "provides": [
         "events"
@@ -404,8 +403,8 @@
       "type": "generic",
       "base": "https://envivo.evaulthub.com",
       "enabled": false,
-      "status": "down",
-      "lastCheck": 1795103599001,
+      "status": "unknown",
+      "lastCheck": 0,
       "weight": 4,
       "provides": [
         "channels",

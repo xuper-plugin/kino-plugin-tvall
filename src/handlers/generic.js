@@ -68,14 +68,7 @@ export default {
     }
 
     if (!r.channelItemRegex) return [];
-    const rows = matchAllNamed(body, r.channelItemRegex);
-    if (r.diag && typeof kino.log === "function") {
-      try {
-        kino.log("[diag] list " + host.id + " bodyLen=" + body.length + " matches=" + rows.length + " first=" + (rows[0] ? (rows[0].id + "|" + rows[0].name) : "none"));
-        kino.log("[diag] list " + host.id + " head=" + body.slice(0, 180).replace(/\s+/g, " "));
-      } catch (_) { /* diag only */ }
-    }
-    return rows
+    return matchAllNamed(body, r.channelItemRegex)
       .filter((g) => g.id)
       .map((g) => ({ id: String(g.id), title: (g.name || g.title || g.id).trim(), logo: g.logo ? abs(host.base, g.logo) : undefined, categoryId: "all" }));
   },
@@ -115,14 +108,6 @@ export default {
               if (p2 && p2.html) { doc = p2.html; try { hopOrigin = new URL(hopUrl).origin; } catch (_) {} }
             } catch (_) { /* keep top doc */ }
           }
-        }
-        if (r.diag && typeof kino.log === "function") {
-          try {
-            kino.log("[diag] page finalUrl=" + (page && page.finalUrl) + " status=" + (page && page.status) + " topLen=" + html.length + " docLen=" + doc.length);
-            (doc.match(/data-url=["'][^"']+["']/gi) || []).slice(0, 8).forEach((x, i) => kino.log("[diag] dataurl#" + i + " " + x.slice(0, 160)));
-            (doc.match(/<iframe[^>]*src=["'][^"']+["']/gi) || []).slice(0, 6).forEach((x, i) => kino.log("[diag] iframe#" + i + " " + x.slice(0, 160)));
-            (doc.match(/https?:\/\/[^"'\s<>]+(\.m3u8|\.mpd|embed|youtube|\/player|stream|\.php)[^"'\s<>]*/gi) || []).slice(0, 8).forEach((x, i) => kino.log("[diag] url#" + i + " " + x.slice(0, 160)));
-          } catch (_) { /* diag only */ }
         }
         const mm = doc.match(/https?:\/\/[^"'\s<>]+\.m3u8[^"'\s<>]*/i);
         if (mm) return { url: mm[0].replace(/\\\//g, "/"), mime: HLS_MIME, headers: { "User-Agent": UA, Referer: hopOrigin + "/", Origin: host.base } };
