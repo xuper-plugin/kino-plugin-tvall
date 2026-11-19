@@ -47,3 +47,21 @@ test("generic returns empty/null when the regex matches nothing (site changed)",
   assert.deepEqual(await generic.listChannels(host, ctx), []);
   assert.equal(await generic.resolve(host, "1", ctx), null);
 });
+
+test("generic listChannels parses a JSON catalog grouped by country when recipe.listJSON is set", async () => {
+  const jsonHost = { base: "https://dl.example", recipe: {
+    listURL: "/stream/canales.json", listJSON: true, playerURL: "/total/stream-{id}.php",
+  } };
+  const ctx = ctxWith({ "https://dl.example/stream/canales.json":
+    JSON.stringify({ Sudamerica: [{ n: "ESPN", id: "01" }, { n: "ESPN 2", id: "02" }], Centro: [{ n: "TNT", id: "88" }] }) });
+  const chans = await generic.listChannels(jsonHost, ctx);
+  assert.deepEqual(chans.map((c) => ({ id: c.id, title: c.title })), [
+    { id: "01", title: "ESPN" }, { id: "02", title: "ESPN 2" }, { id: "88", title: "TNT" },
+  ]);
+});
+
+test("generic listChannels with listJSON returns empty on invalid JSON (site changed)", async () => {
+  const jsonHost = { base: "https://dl.example", recipe: { listURL: "/stream/canales.json", listJSON: true } };
+  const ctx = ctxWith({ "https://dl.example/stream/canales.json": "not json" });
+  assert.deepEqual(await generic.listChannels(jsonHost, ctx), []);
+});

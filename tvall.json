@@ -76,14 +76,26 @@
       "name": "DeporteLibre",
       "type": "generic",
       "base": "https://deportelibre.top",
-      "enabled": false,
+      "enabled": true,
       "status": "unknown",
       "lastCheck": 0,
-      "weight": 5,
+      "weight": 8,
       "provides": [
-        "events"
+        "channels"
       ],
-      "recipe": {}
+      "recipe": {
+        "listURL": "/stream/canales.json",
+        "listJSON": true,
+        "playerURL": "/total/stream-{id}.php",
+        "capture": true,
+        "match": "\\.m3u8",
+        "captureAll": true,
+        "alsoMatch": [
+          "index\\.m3u8",
+          "/live/",
+          "/hls/"
+        ]
+      }
     },
     {
       "id": "ntv",

@@ -36,11 +36,25 @@ function matchNamed(html, pattern) {
 export default {
   async listChannels(host, ctx) {
     const r = host.recipe || {};
-    if (!r.listURL || !r.channelItemRegex) return [];
-    let html;
-    try { html = await ctx.fetchText(abs(host.base, r.listURL), { Referer: host.base + "/" }, { deadline: ctx.deadline }); }
+    if (!r.listURL) return [];
+    let body;
+    try { body = await ctx.fetchText(abs(host.base, r.listURL), { Referer: host.base + "/" }, { deadline: ctx.deadline }); }
     catch (_) { return []; }
-    return matchAllNamed(html, r.channelItemRegex)
+
+    // listJSON: the host serves its channel catalog as JSON (object of arrays, or a flat array) instead
+    // of HTML — no regex needed, just a {id, name|n} shape per entry.
+    if (r.listJSON) {
+      let data;
+      try { data = JSON.parse(body); } catch (_) { return []; }
+      const groups = Array.isArray(data) ? [data] : Object.values(data || {});
+      const items = groups.flatMap((g) => (Array.isArray(g) ? g : []));
+      return items
+        .filter((it) => it && it.id != null)
+        .map((it) => ({ id: String(it.id), title: String(it.name || it.n || it.title || it.id).trim(), categoryId: "all" }));
+    }
+
+    if (!r.channelItemRegex) return [];
+    return matchAllNamed(body, r.channelItemRegex)
       .filter((g) => g.id)
       .map((g) => ({ id: String(g.id), title: (g.name || g.title || g.id).trim(), logo: g.logo ? abs(host.base, g.logo) : undefined, categoryId: "all" }));
   },

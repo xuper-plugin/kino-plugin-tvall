@@ -111,14 +111,26 @@ var SEED = {
       "name": "DeporteLibre",
       "type": "generic",
       "base": "https://deportelibre.top",
-      "enabled": false,
+      "enabled": true,
       "status": "unknown",
       "lastCheck": 0,
-      "weight": 5,
+      "weight": 8,
       "provides": [
-        "events"
+        "channels"
       ],
-      "recipe": {}
+      "recipe": {
+        "listURL": "/stream/canales.json",
+        "listJSON": true,
+        "playerURL": "/total/stream-{id}.php",
+        "capture": true,
+        "match": "\\.m3u8",
+        "captureAll": true,
+        "alsoMatch": [
+          "index\\.m3u8",
+          "/live/",
+          "/hls/"
+        ]
+      }
     },
     {
       "id": "ntv",
@@ -353,14 +365,26 @@ function matchNamed(html, pattern) {
 var generic_default = {
   async listChannels(host, ctx2) {
     const r = host.recipe || {};
-    if (!r.listURL || !r.channelItemRegex) return [];
-    let html;
+    if (!r.listURL) return [];
+    let body;
     try {
-      html = await ctx2.fetchText(abs(host.base, r.listURL), { Referer: host.base + "/" }, { deadline: ctx2.deadline });
+      body = await ctx2.fetchText(abs(host.base, r.listURL), { Referer: host.base + "/" }, { deadline: ctx2.deadline });
     } catch (_) {
       return [];
     }
-    return matchAllNamed(html, r.channelItemRegex).filter((g) => g.id).map((g) => ({ id: String(g.id), title: (g.name || g.title || g.id).trim(), logo: g.logo ? abs(host.base, g.logo) : void 0, categoryId: "all" }));
+    if (r.listJSON) {
+      let data;
+      try {
+        data = JSON.parse(body);
+      } catch (_) {
+        return [];
+      }
+      const groups = Array.isArray(data) ? [data] : Object.values(data || {});
+      const items = groups.flatMap((g) => Array.isArray(g) ? g : []);
+      return items.filter((it) => it && it.id != null).map((it) => ({ id: String(it.id), title: String(it.name || it.n || it.title || it.id).trim(), categoryId: "all" }));
+    }
+    if (!r.channelItemRegex) return [];
+    return matchAllNamed(body, r.channelItemRegex).filter((g) => g.id).map((g) => ({ id: String(g.id), title: (g.name || g.title || g.id).trim(), logo: g.logo ? abs(host.base, g.logo) : void 0, categoryId: "all" }));
   },
   async listEvents(host, ctx2) {
     const r = host.recipe || {};
