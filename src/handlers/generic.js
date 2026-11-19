@@ -84,6 +84,9 @@ export default {
         // captureAll collects every matching request (not just the first the page plays), so a player that
         // fires the .m3u8 among many requests, or behind a challenge, still gets caught. alsoMatch widens it.
         if (r.captureAll && kino.browser.captureAll) { opts.captureAll = true; if (r.alsoMatch) opts.alsoMatch = r.alsoMatch; }
+        // returnCookiesOnTimeout: make capture RESOLVE on timeout (with requests/cookies/timedOut) instead of
+        // throwing, so a diag run can inspect what the player requested even when no media autoplayed.
+        if (r.returnCookiesOnTimeout) opts.returnCookiesOnTimeout = true;
         const cap = await kino.browser.capture(playerUrl, opts);
         // diag: a throwaway probe. Dump everything the WebView handed back so a logcat read shows which
         // URL the player actually requested (tokenised path, non-.m3u8 extension, or the challenged one).

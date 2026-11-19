@@ -90,6 +90,7 @@ export const SEED = {
         "playerURL": "/total/stream-{id}.php",
         "capture": true,
         "diag": true,
+        "returnCookiesOnTimeout": true,
         "match": "\\.(m3u8|ts|mpd|mp4|fmp4|key)",
         "captureAll": true,
         "alsoMatch": [
