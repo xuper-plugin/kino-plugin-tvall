@@ -42,7 +42,7 @@ var SEED = {
       "name": "TheDaddy",
       "type": "generic",
       "base": "https://thedaddy.li",
-      "enabled": true,
+      "enabled": false,
       "status": "unknown",
       "lastCheck": 0,
       "weight": 10,
