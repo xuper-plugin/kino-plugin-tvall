@@ -111,7 +111,7 @@ var SEED = {
       "name": "DeporteLibre",
       "type": "generic",
       "base": "https://deportelibre.top",
-      "enabled": true,
+      "enabled": false,
       "status": "unknown",
       "lastCheck": 0,
       "weight": 8,
@@ -168,17 +168,169 @@ var SEED = {
     {
       "id": "zicotv",
       "name": "ZicoTV",
-      "type": "generic",
+      "type": "zicotv",
       "base": "https://bp.zicotv.cc",
-      "enabled": false,
+      "enabled": true,
       "status": "unknown",
       "lastCheck": 0,
-      "weight": 5,
+      "weight": 9,
       "provides": [
         "channels",
         "events"
       ],
-      "recipe": {}
+      "recipe": {
+        "eventsURL": "/api/events",
+        "channels": [
+          {
+            "id": 1,
+            "name": "DAZN LaLiga"
+          },
+          {
+            "id": 2,
+            "name": "DAZN 1 Spain"
+          },
+          {
+            "id": 3,
+            "name": "DAZN 2 Spain"
+          },
+          {
+            "id": 4,
+            "name": "LaLiga TV Bar"
+          },
+          {
+            "id": 5,
+            "name": "Movistar Liga de Campeones 3"
+          },
+          {
+            "id": 6,
+            "name": "Movistar Liga de Campeones"
+          },
+          {
+            "id": 7,
+            "name": "Movistar Liga de Campeones 4"
+          },
+          {
+            "id": 8,
+            "name": "Movistar Liga de Campeones 2"
+          },
+          {
+            "id": 9,
+            "name": "Movistar #Vamos"
+          },
+          {
+            "id": 10,
+            "name": "ESPN Deportes"
+          },
+          {
+            "id": 11,
+            "name": "DAZN F1 Spain"
+          },
+          {
+            "id": 12,
+            "name": "LaLiga TV Hypermotion"
+          },
+          {
+            "id": 13,
+            "name": "Sky Sports Main Event"
+          },
+          {
+            "id": 14,
+            "name": "Movistar Liga de Campeones 5"
+          },
+          {
+            "id": 15,
+            "name": "DAZN LaLiga 2"
+          },
+          {
+            "id": 16,
+            "name": "Sport TV 2"
+          },
+          {
+            "id": 17,
+            "name": "Amazon Prime Video Spain"
+          },
+          {
+            "id": 18,
+            "name": "Movistar Deportes 3"
+          },
+          {
+            "id": 19,
+            "name": "Movistar Deportes"
+          },
+          {
+            "id": 20,
+            "name": "Movistar Deportes 6"
+          },
+          {
+            "id": 21,
+            "name": "UFC"
+          },
+          {
+            "id": 22,
+            "name": "LaLiga TV 2 por Movistar Plus"
+          },
+          {
+            "id": 23,
+            "name": "Eurosport Player Spain"
+          },
+          {
+            "id": 24,
+            "name": "LaLiga TV Hypermotion 2"
+          },
+          {
+            "id": 25,
+            "name": "NBA 1"
+          },
+          {
+            "id": 28,
+            "name": "Movistar Plus+"
+          },
+          {
+            "id": 32,
+            "name": "Multichampions"
+          },
+          {
+            "id": 34,
+            "name": "DAZN 3 Spain"
+          },
+          {
+            "id": 35,
+            "name": "Movistar Deportes 2"
+          },
+          {
+            "id": 36,
+            "name": "Eurosport 2 Spain"
+          },
+          {
+            "id": 37,
+            "name": "DAZN 4 Spain"
+          },
+          {
+            "id": 38,
+            "name": "LaLiga TV Bar Aux"
+          },
+          {
+            "id": 39,
+            "name": "Movistar LaLiga 4"
+          },
+          {
+            "id": 41,
+            "name": "Movistar LaLiga 3"
+          },
+          {
+            "id": 46,
+            "name": "Movistar Liga de Campeones 8"
+          },
+          {
+            "id": 47,
+            "name": "Movistar Liga de Campeones 7"
+          },
+          {
+            "id": 48,
+            "name": "Movistar Liga de Campeones 6"
+          }
+        ]
+      }
     },
     {
       "id": "matchora",
@@ -321,13 +473,15 @@ function activeHosts(cat) {
 
 // src/net.js
 var UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0";
-async function fetchText(url, headers, { tries = 2, deadline } = {}) {
+async function fetchText(url, headers, { tries = 2, deadline, method = "GET", body } = {}) {
   let lastErr;
   for (let i = 0; i < tries; i++) {
     const left = deadline ? deadline - Date.now() : 8e3;
     if (left <= 0) break;
     try {
-      const r = await kino.fetch(url, { headers: { "User-Agent": UA, ...headers || {} }, timeoutMs: Math.min(8e3, left) });
+      const req = { method, headers: { "User-Agent": UA, ...headers || {} }, timeoutMs: Math.min(8e3, left) };
+      if (method !== "GET" && body !== void 0) req.body = body;
+      const r = await kino.fetch(url, req);
       if (!r.ok) throw new Error("http " + r.status);
       return await r.text();
     } catch (e) {
@@ -487,8 +641,128 @@ var daddylive_default = {
   }
 };
 
+// src/handlers/zicotv.js
+var HLS_MIME2 = "application/x-mpegURL";
+var abs2 = (b, u) => /^https?:\/\//i.test(u) ? u : b.replace(/\/+$/, "") + "/" + String(u).replace(/^\/+/, "");
+function inertiaProps(html) {
+  const m = /data-page="([^"]*)"/.exec(String(html || ""));
+  if (!m) return null;
+  const json = m[1].replace(/&quot;/g, '"').replace(/&#0?39;/g, "'").replace(/&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  try {
+    return JSON.parse(json).props || null;
+  } catch (_) {
+    return null;
+  }
+}
+function renewUrl(html) {
+  const m = /ZT_RENEW\s*=\s*(\{[\s\S]*?\})\s*;/.exec(String(html || ""));
+  if (!m) return null;
+  try {
+    const o = JSON.parse(m[1]);
+    return o && o.url ? o.url : null;
+  } catch (_) {
+    return null;
+  }
+}
+async function mintStream(base, pid, ctx2) {
+  let playerHtml;
+  try {
+    playerHtml = await ctx2.fetchText(abs2(base, "/api/player/" + pid), { Referer: base + "/" }, { deadline: ctx2.deadline });
+  } catch (_) {
+    return null;
+  }
+  const ru = renewUrl(playerHtml);
+  if (!ru) return null;
+  let resp;
+  try {
+    resp = await ctx2.fetchText(
+      abs2(base, ru.replace(/\\\//g, "/")),
+      { Accept: "application/json", Referer: base + "/", "X-Requested-With": "XMLHttpRequest" },
+      { deadline: ctx2.deadline, method: "POST", body: "" }
+    );
+  } catch (_) {
+    return null;
+  }
+  let data;
+  try {
+    data = JSON.parse(resp);
+  } catch (_) {
+    return null;
+  }
+  const sources = Array.isArray(data && data.sources) ? data.sources : [];
+  const ok = (s) => s && s.url && /\.m3u8/i.test(s.url);
+  const pick = sources.find((s) => ok(s) && !s.premium) || sources.find(ok);
+  return pick ? pick.url : null;
+}
+var zicotv_default = {
+  // The curated channel catalog lives in the recipe (id = the zicotv player pid).
+  async listChannels(host, _ctx) {
+    const chans = host.recipe && host.recipe.channels || [];
+    return chans.filter((c) => c && c.id != null).map((c) => ({ id: String(c.id), title: String(c.name || c.title || c.id).trim(), categoryId: "all" }));
+  },
+  // Open events API. Keep only own-stream events (manual-only events point at walled embeds); the id is
+  // prefixed "ev:" so resolve knows to look its player pid up from the event page first.
+  async listEvents(host, ctx2) {
+    const r = host.recipe || {};
+    if (!r.eventsURL) return [];
+    let body;
+    try {
+      body = await ctx2.fetchText(abs2(host.base, r.eventsURL), { Accept: "application/json", Referer: host.base + "/" }, { deadline: ctx2.deadline });
+    } catch (_) {
+      return [];
+    }
+    let data;
+    try {
+      data = JSON.parse(body);
+    } catch (_) {
+      return [];
+    }
+    const evs = [];
+    const walk = (o) => {
+      if (Array.isArray(o)) {
+        o.forEach(walk);
+        return;
+      }
+      if (o && typeof o === "object") {
+        if ("has_stream" in o || "has_own_stream" in o) evs.push(o);
+        else Object.values(o).forEach(walk);
+      }
+    };
+    walk(data);
+    return evs.filter((e) => e && e.has_own_stream && e.id != null).map((e) => ({ id: "ev:" + e.id, title: String(e.title || e.id).trim(), start: Date.parse(e.start_time) || 0, categoryId: "live-now" }));
+  },
+  async resolve(host, id, ctx2) {
+    const base = host.base;
+    let pid = String(id);
+    if (pid.startsWith("ev:")) {
+      const eid = pid.slice(3);
+      let evHtml;
+      try {
+        evHtml = await ctx2.fetchText(abs2(base, "/events/" + eid), { Referer: base + "/" }, { deadline: ctx2.deadline });
+      } catch (_) {
+        return null;
+      }
+      const props = inertiaProps(evHtml);
+      const own = props && Array.isArray(props.ownStreams) ? props.ownStreams : [];
+      const chosen = own.find((s) => s && s.player_url && !s.is_premium) || own.find((s) => s && s.player_url);
+      const pm = chosen && /\/api\/player\/(\d+)/.exec(chosen.player_url);
+      if (!pm) return null;
+      pid = pm[1];
+    }
+    const url = await mintStream(base, pid, ctx2);
+    if (!url) return null;
+    return { url, mime: HLS_MIME2, headers: { "User-Agent": UA, Referer: base + "/" } };
+  },
+  async health(host, ctx2) {
+    const chans = await this.listChannels(host, ctx2).catch(() => []);
+    if (!chans.length) return { ok: false, channels: 0 };
+    const s = await this.resolve(host, chans[0].id, ctx2).catch(() => null);
+    return { ok: !!s, channels: chans.length };
+  }
+};
+
 // src/handlers/index.js
-var HANDLERS = { generic: generic_default, daddylive: daddylive_default };
+var HANDLERS = { generic: generic_default, daddylive: daddylive_default, zicotv: zicotv_default };
 function handlerFor(host) {
   return host && HANDLERS[host.type] || null;
 }

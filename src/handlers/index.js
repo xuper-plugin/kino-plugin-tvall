@@ -1,7 +1,8 @@
 import generic from "./generic.js";
 import daddylive from "./daddylive.js";
+import zicotv from "./zicotv.js";
 
-const HANDLERS = { generic, daddylive };
+const HANDLERS = { generic, daddylive, zicotv };
 
 /** The handler for a host's `type`, or null when no handler is registered for it. */
 export function handlerFor(host) {

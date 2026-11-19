@@ -77,7 +77,7 @@ export const SEED = {
       "name": "DeporteLibre",
       "type": "generic",
       "base": "https://deportelibre.top",
-      "enabled": true,
+      "enabled": false,
       "status": "unknown",
       "lastCheck": 0,
       "weight": 8,
@@ -134,17 +134,169 @@ export const SEED = {
     {
       "id": "zicotv",
       "name": "ZicoTV",
-      "type": "generic",
+      "type": "zicotv",
       "base": "https://bp.zicotv.cc",
-      "enabled": false,
+      "enabled": true,
       "status": "unknown",
       "lastCheck": 0,
-      "weight": 5,
+      "weight": 9,
       "provides": [
         "channels",
         "events"
       ],
-      "recipe": {}
+      "recipe": {
+        "eventsURL": "/api/events",
+        "channels": [
+          {
+            "id": 1,
+            "name": "DAZN LaLiga"
+          },
+          {
+            "id": 2,
+            "name": "DAZN 1 Spain"
+          },
+          {
+            "id": 3,
+            "name": "DAZN 2 Spain"
+          },
+          {
+            "id": 4,
+            "name": "LaLiga TV Bar"
+          },
+          {
+            "id": 5,
+            "name": "Movistar Liga de Campeones 3"
+          },
+          {
+            "id": 6,
+            "name": "Movistar Liga de Campeones"
+          },
+          {
+            "id": 7,
+            "name": "Movistar Liga de Campeones 4"
+          },
+          {
+            "id": 8,
+            "name": "Movistar Liga de Campeones 2"
+          },
+          {
+            "id": 9,
+            "name": "Movistar #Vamos"
+          },
+          {
+            "id": 10,
+            "name": "ESPN Deportes"
+          },
+          {
+            "id": 11,
+            "name": "DAZN F1 Spain"
+          },
+          {
+            "id": 12,
+            "name": "LaLiga TV Hypermotion"
+          },
+          {
+            "id": 13,
+            "name": "Sky Sports Main Event"
+          },
+          {
+            "id": 14,
+            "name": "Movistar Liga de Campeones 5"
+          },
+          {
+            "id": 15,
+            "name": "DAZN LaLiga 2"
+          },
+          {
+            "id": 16,
+            "name": "Sport TV 2"
+          },
+          {
+            "id": 17,
+            "name": "Amazon Prime Video Spain"
+          },
+          {
+            "id": 18,
+            "name": "Movistar Deportes 3"
+          },
+          {
+            "id": 19,
+            "name": "Movistar Deportes"
+          },
+          {
+            "id": 20,
+            "name": "Movistar Deportes 6"
+          },
+          {
+            "id": 21,
+            "name": "UFC"
+          },
+          {
+            "id": 22,
+            "name": "LaLiga TV 2 por Movistar Plus"
+          },
+          {
+            "id": 23,
+            "name": "Eurosport Player Spain"
+          },
+          {
+            "id": 24,
+            "name": "LaLiga TV Hypermotion 2"
+          },
+          {
+            "id": 25,
+            "name": "NBA 1"
+          },
+          {
+            "id": 28,
+            "name": "Movistar Plus+"
+          },
+          {
+            "id": 32,
+            "name": "Multichampions"
+          },
+          {
+            "id": 34,
+            "name": "DAZN 3 Spain"
+          },
+          {
+            "id": 35,
+            "name": "Movistar Deportes 2"
+          },
+          {
+            "id": 36,
+            "name": "Eurosport 2 Spain"
+          },
+          {
+            "id": 37,
+            "name": "DAZN 4 Spain"
+          },
+          {
+            "id": 38,
+            "name": "LaLiga TV Bar Aux"
+          },
+          {
+            "id": 39,
+            "name": "Movistar LaLiga 4"
+          },
+          {
+            "id": 41,
+            "name": "Movistar LaLiga 3"
+          },
+          {
+            "id": 46,
+            "name": "Movistar Liga de Campeones 8"
+          },
+          {
+            "id": 47,
+            "name": "Movistar Liga de Campeones 7"
+          },
+          {
+            "id": 48,
+            "name": "Movistar Liga de Campeones 6"
+          }
+        ]
+      }
     },
     {
       "id": "matchora",
