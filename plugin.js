@@ -350,7 +350,9 @@ var SEED = {
           "index\\.m3u8",
           "/hls/",
           "/live/"
-        ]
+        ],
+        "preferHost": "matchora",
+        "captureReferer": "https://matchora.to/"
       }
     },
     {
@@ -527,6 +529,16 @@ function matchNamed(html, pattern) {
   const m = re.exec(String(html || ""));
   return m ? m.groups || {} : null;
 }
+function pickCaptured(cap, preferRe) {
+  const media = cap && Array.isArray(cap.media) ? cap.media.filter((x) => x && x.url) : [];
+  let m = preferRe && media.find((x) => preferRe.test(x.url)) || media[0] || null;
+  if (!m) {
+    const reqs = cap && Array.isArray(cap.requests) ? cap.requests.filter((x) => x && x.url && /\.m3u8/i.test(x.url)) : [];
+    const q = preferRe && reqs.find((x) => preferRe.test(x.url)) || reqs.find((x) => /\.m3u8(\?|$)/i.test(x.url)) || reqs[0];
+    if (q) m = { url: q.url, headers: q.headers };
+  }
+  return m || null;
+}
 var generic_default = {
   async listChannels(host, ctx2) {
     const r = host.recipe || {};
@@ -576,13 +588,19 @@ var generic_default = {
         }
         if (r.returnCookiesOnTimeout) opts.returnCookiesOnTimeout = true;
         const cap = await kino.browser.capture(playerUrl, opts);
-        let m = cap && cap.media && cap.media[0];
-        if (!m && cap && Array.isArray(cap.requests)) {
-          const q = cap.requests.find((x) => /\.m3u8(\?|$)/i.test(x.url)) || cap.requests.find((x) => /\.m3u8/i.test(x.url));
-          if (q) m = { url: q.url, headers: q.headers };
+        let prefer = null;
+        if (r.preferHost) {
+          try {
+            prefer = new RegExp(r.preferHost, "i");
+          } catch (_) {
+            prefer = null;
+          }
         }
+        const m = pickCaptured(cap, prefer);
         if (!m || !m.url) return null;
-        return { url: m.url, mime: m.mime || HLS_MIME, headers: m.headers || { "User-Agent": UA, Referer: host.base + "/" } };
+        const streamRef = r.captureReferer || host.base + "/";
+        const headers = { "User-Agent": UA, Referer: streamRef, Origin: host.base, ...m.headers || {} };
+        return { url: m.url, mime: m.mime || HLS_MIME, headers };
       } catch (_) {
         return null;
       }

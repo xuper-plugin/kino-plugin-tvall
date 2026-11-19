@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import generic from "../src/handlers/generic.js";
+import generic, { pickCaptured } from "../src/handlers/generic.js";
 
 // A ctx whose fetchText serves canned pages by URL — the recipe engine is tested against fixtures, not a live site.
 function ctxWith(pages) {
@@ -64,4 +64,36 @@ test("generic listChannels with listJSON returns empty on invalid JSON (site cha
   const jsonHost = { base: "https://dl.example", recipe: { listURL: "/stream/canales.json", listJSON: true } };
   const ctx = ctxWith({ "https://dl.example/stream/canales.json": "not json" });
   assert.deepEqual(await generic.listChannels(jsonHost, ctx), []);
+});
+
+test("pickCaptured prefers a media whose URL matches preferRe (e.g. the source's own CDN)", () => {
+  const cap = { media: [
+    { url: "https://e.biboguv.cyou/hls/1/index.m3u8", mime: "application/x-mpegURL", headers: { Referer: "https://mx.to/" } },
+    { url: "https://edge.matchora.pro/hls/1/index.m3u8", mime: "application/x-mpegURL", headers: { Referer: "https://mx.to/" } },
+  ] };
+  const m = pickCaptured(cap, /matchora/i);
+  assert.equal(m.url, "https://edge.matchora.pro/hls/1/index.m3u8");
+});
+
+test("pickCaptured falls back to the first media when preferRe matches nothing", () => {
+  const cap = { media: [
+    { url: "https://a.cdn/one.m3u8" }, { url: "https://b.cdn/two.m3u8" },
+  ] };
+  assert.equal(pickCaptured(cap, /zzz/).url, "https://a.cdn/one.m3u8");
+  assert.equal(pickCaptured(cap, null).url, "https://a.cdn/one.m3u8");
+});
+
+test("pickCaptured scans raw requests for an .m3u8 when no media was returned, preferRe-aware", () => {
+  const cap = { media: [], requests: [
+    { url: "https://ads.x/beacon.js" },
+    { url: "https://e.biboguv.cyou/hls/1/index.m3u8", headers: { Referer: "https://mx.to/" } },
+    { url: "https://edge.matchora.pro/hls/1/index.m3u8", headers: { Referer: "https://mx.to/" } },
+  ] };
+  assert.equal(pickCaptured(cap, /matchora/i).url, "https://edge.matchora.pro/hls/1/index.m3u8");
+  assert.equal(pickCaptured(cap, null).url, "https://e.biboguv.cyou/hls/1/index.m3u8");
+});
+
+test("pickCaptured returns null when there is no media and no .m3u8 request", () => {
+  assert.equal(pickCaptured({ media: [], requests: [{ url: "https://x/y.js" }] }, null), null);
+  assert.equal(pickCaptured(null, null), null);
 });

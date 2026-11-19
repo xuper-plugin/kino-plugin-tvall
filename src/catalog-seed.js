@@ -316,7 +316,9 @@ export const SEED = {
           "index\\.m3u8",
           "/hls/",
           "/live/"
-        ]
+        ],
+        "preferHost": "matchora",
+        "captureReferer": "https://matchora.to/"
       }
     },
     {

@@ -33,6 +33,20 @@ function matchNamed(html, pattern) {
   return m ? m.groups || {} : null;
 }
 
+// Choose the best captured stream: a page often serves the same .m3u8 from several CDNs, and only the
+// site's own edge plays (a random partner CDN rejects the player's headers). preferRe picks that edge;
+// otherwise the first media wins. Falls back to scanning raw requests for an .m3u8 when no media played.
+export function pickCaptured(cap, preferRe) {
+  const media = cap && Array.isArray(cap.media) ? cap.media.filter((x) => x && x.url) : [];
+  let m = (preferRe && media.find((x) => preferRe.test(x.url))) || media[0] || null;
+  if (!m) {
+    const reqs = cap && Array.isArray(cap.requests) ? cap.requests.filter((x) => x && x.url && /\.m3u8/i.test(x.url)) : [];
+    const q = (preferRe && reqs.find((x) => preferRe.test(x.url))) || reqs.find((x) => /\.m3u8(\?|$)/i.test(x.url)) || reqs[0];
+    if (q) m = { url: q.url, headers: q.headers };
+  }
+  return m || null;
+}
+
 export default {
   async listChannels(host, ctx) {
     const r = host.recipe || {};
@@ -88,13 +102,15 @@ export default {
         // throwing, so a diag run can inspect what the player requested even when no media autoplayed.
         if (r.returnCookiesOnTimeout) opts.returnCookiesOnTimeout = true;
         const cap = await kino.browser.capture(playerUrl, opts);
-        let m = cap && cap.media && cap.media[0];
-        if (!m && cap && Array.isArray(cap.requests)) {
-          const q = cap.requests.find((x) => /\.m3u8(\?|$)/i.test(x.url)) || cap.requests.find((x) => /\.m3u8/i.test(x.url));
-          if (q) m = { url: q.url, headers: q.headers };
-        }
+        let prefer = null;
+        if (r.preferHost) { try { prefer = new RegExp(r.preferHost, "i"); } catch (_) { prefer = null; } }
+        const m = pickCaptured(cap, prefer);
         if (!m || !m.url) return null;
-        return { url: m.url, mime: m.mime || HLS_MIME, headers: m.headers || { "User-Agent": UA, Referer: host.base + "/" } };
+        // The CDN segments usually need the site's Referer/Origin; seed them, then let the captured
+        // headers (the exact ones the player used) override. captureReferer tunes the stream Referer too.
+        const streamRef = r.captureReferer || host.base + "/";
+        const headers = { "User-Agent": UA, Referer: streamRef, Origin: host.base, ...(m.headers || {}) };
+        return { url: m.url, mime: m.mime || HLS_MIME, headers };
       } catch (_) { return null; }
     }
 
