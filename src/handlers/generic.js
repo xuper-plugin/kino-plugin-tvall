@@ -66,8 +66,16 @@ export default {
     if (r.capture) {
       try {
         const left = Math.max(1000, (ctx.deadline || Date.now() + 18000) - Date.now());
-        const cap = await kino.browser.capture(playerUrl, { match: r.match || undefined, headers: { Referer: host.base + "/" }, timeoutMs: left });
-        const m = cap && cap.media && cap.media[0];
+        const opts = { match: r.match || undefined, headers: { Referer: r.captureReferer || host.base + "/" }, timeoutMs: left };
+        // captureAll collects every matching request (not just the first the page plays), so a player that
+        // fires the .m3u8 among many requests, or behind a challenge, still gets caught. alsoMatch widens it.
+        if (r.captureAll && kino.browser.captureAll) { opts.captureAll = true; if (r.alsoMatch) opts.alsoMatch = r.alsoMatch; }
+        const cap = await kino.browser.capture(playerUrl, opts);
+        let m = cap && cap.media && cap.media[0];
+        if (!m && cap && Array.isArray(cap.requests)) {
+          const q = cap.requests.find((x) => /\.m3u8(\?|$)/i.test(x.url)) || cap.requests.find((x) => /\.m3u8/i.test(x.url));
+          if (q) m = { url: q.url, headers: q.headers };
+        }
         if (!m || !m.url) return null;
         return { url: m.url, mime: m.mime || HLS_MIME, headers: m.headers || { "User-Agent": UA, Referer: host.base + "/" } };
       } catch (_) { return null; }

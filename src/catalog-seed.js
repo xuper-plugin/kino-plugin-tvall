@@ -20,7 +20,13 @@ export const SEED = {
         "channelItemRegex": "href=\"/watch\\.php\\?id=(?<id>\\d+)\"[\\s\\S]*?class=\"card__title\">(?<name>[^<]+)<",
         "playerURL": "/watch.php?id={id}",
         "capture": true,
-        "match": "m3u8"
+        "match": "\\.m3u8",
+        "captureAll": true,
+        "alsoMatch": [
+          "index\\.m3u8",
+          "mono\\.m3u8",
+          "/premium"
+        ]
       }
     },
     {

@@ -54,7 +54,13 @@ var SEED = {
         "channelItemRegex": 'href="/watch\\.php\\?id=(?<id>\\d+)"[\\s\\S]*?class="card__title">(?<name>[^<]+)<',
         "playerURL": "/watch.php?id={id}",
         "capture": true,
-        "match": "m3u8"
+        "match": "\\.m3u8",
+        "captureAll": true,
+        "alsoMatch": [
+          "index\\.m3u8",
+          "mono\\.m3u8",
+          "/premium"
+        ]
       }
     },
     {
@@ -374,8 +380,17 @@ var generic_default = {
     if (r.capture) {
       try {
         const left = Math.max(1e3, (ctx2.deadline || Date.now() + 18e3) - Date.now());
-        const cap = await kino.browser.capture(playerUrl, { match: r.match || void 0, headers: { Referer: host.base + "/" }, timeoutMs: left });
-        const m = cap && cap.media && cap.media[0];
+        const opts = { match: r.match || void 0, headers: { Referer: r.captureReferer || host.base + "/" }, timeoutMs: left };
+        if (r.captureAll && kino.browser.captureAll) {
+          opts.captureAll = true;
+          if (r.alsoMatch) opts.alsoMatch = r.alsoMatch;
+        }
+        const cap = await kino.browser.capture(playerUrl, opts);
+        let m = cap && cap.media && cap.media[0];
+        if (!m && cap && Array.isArray(cap.requests)) {
+          const q = cap.requests.find((x) => /\.m3u8(\?|$)/i.test(x.url)) || cap.requests.find((x) => /\.m3u8/i.test(x.url));
+          if (q) m = { url: q.url, headers: q.headers };
+        }
         if (!m || !m.url) return null;
         return { url: m.url, mime: m.mime || HLS_MIME, headers: m.headers || { "User-Agent": UA, Referer: host.base + "/" } };
       } catch (_) {
