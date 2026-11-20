@@ -1,7 +1,7 @@
 // Generated from tvall.json — the offline fallback source list. Keep in sync (test/seed asserts equality).
 export const SEED = {
   "schema": 1,
-  "updatedAt": 0,
+  "updatedAt": 1795188999389,
   "hosts": [
     {
       "id": "thedaddy",
@@ -9,8 +9,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://thedaddy.li",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 10,
       "provides": [
         "channels"
@@ -35,8 +35,8 @@ export const SEED = {
       "type": "daddylive",
       "base": "https://daddylive.app",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 10,
       "provides": [
         "channels",
@@ -50,8 +50,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://verpartidos.cc",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 5,
       "provides": [
         "events"
@@ -64,8 +64,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://tiroalpalooffi.com",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 5,
       "provides": [
         "events"
@@ -78,8 +78,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://deportelibre.top",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 8,
       "provides": [
         "channels"
@@ -104,8 +104,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://ntv.cx",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 5,
       "provides": [
         "channels"
@@ -118,8 +118,8 @@ export const SEED = {
       "type": "livetv",
       "base": "https://livetv.sx",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 6,
       "provides": [
         "events"
@@ -132,8 +132,8 @@ export const SEED = {
       "type": "zicotv",
       "base": "https://bp.zicotv.cc",
       "enabled": true,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 9,
       "provides": [
         "channels",
@@ -299,8 +299,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://matchora.to",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 7,
       "provides": [
         "events"
@@ -327,8 +327,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://teledeportes.st",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 5,
       "provides": [
         "events"
@@ -341,8 +341,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://dondeverfutbolhoy.com",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 6,
       "provides": [
         "channels"
@@ -361,8 +361,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://damitv.st",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 5,
       "provides": [
         "channels",
@@ -376,8 +376,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://tvnow247.top",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 5,
       "provides": [
         "channels"
@@ -390,8 +390,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://tarjetarojatvdirecta.online",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 4,
       "provides": [
         "events"
@@ -404,8 +404,8 @@ export const SEED = {
       "type": "generic",
       "base": "https://envivo.evaulthub.com",
       "enabled": false,
-      "status": "unknown",
-      "lastCheck": 0,
+      "status": "down",
+      "lastCheck": 1795188999389,
       "weight": 4,
       "provides": [
         "channels",
