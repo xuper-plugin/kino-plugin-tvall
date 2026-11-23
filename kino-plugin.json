@@ -1,7 +1,7 @@
 {
   "id": "tvall",
   "name": "TVall",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "apiVersion": 9,
   "entry": "plugin.js",
   "icon": "icon.png",
@@ -18,6 +18,7 @@
     "resolve"
   ],
   "liveStreamHosts": "any",
+  "streamHosts": "any",
   "fetchHosts": "any",
   "hosts": [
     {
@@ -38,6 +39,6 @@
   "browser": "pages",
   "signature": {
     "authorKey": "6693946bd5c56196960959c4b9665fad5094374bcb85ddb282f8bf762c835263",
-    "value": "4958888f92b6c5e27116412484e36f11f100b473e5702d4765106ec5b4c587a1b254cb2c8e3707966476ec972cbc462b427bd7404ae8f430175ade7c744f8900"
+    "value": "5647af64465655f595275ca32f9f5aa3c9c51b1d66c2d8901cc1792c4840a77f1bd7317022876fcc168e7b7339afee4d5ee98ea99d92768ca574ddca5f5b7108"
   }
 }
